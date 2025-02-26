@@ -1,15 +1,26 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, Keypair } from '@solana/web3.js';
+import { 
+  Connection, 
+  PublicKey, 
+  Transaction, 
+  SystemProgram, 
+  LAMPORTS_PER_SOL, 
+  Keypair 
+} from '@solana/web3.js';
+import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token';
 import bs58 from 'bs58';
+import config from '@/config/config';
 
 interface SolanaContextType {
   balance: number;
+  tokenBalance: number;
   publicKey: string | null;
   privateKey: string | null;
   createWallet: () => Promise<void>;
   importWallet: (privateKeyString: string) => Promise<void>;
   sendTransaction: (recipientAddress: string, amount: number) => Promise<string>;
+  sendTokens: (recipientAddress: string, amount: number) => Promise<string>;
   connection: Connection;
 }
 
@@ -25,25 +36,51 @@ export const useSolana = () => {
 
 export const SolanaProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [balance, setBalance] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(0);
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
-  const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+  const connection = new Connection(
+    config.network === 'mainnet-beta' 
+      ? 'https://api.mainnet-beta.solana.com' 
+      : 'https://api.devnet.solana.com',
+    'confirmed'
+  );
 
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchBalances = async () => {
       if (publicKey) {
         try {
-          const balance = await connection.getBalance(new PublicKey(publicKey));
-          setBalance(balance / LAMPORTS_PER_SOL);
+          // Fetch SOL balance
+          const solBalance = await connection.getBalance(new PublicKey(publicKey));
+          setBalance(solBalance / LAMPORTS_PER_SOL);
+
+          // Fetch token balance if mint address is configured
+          if (config.token.mintAddress) {
+            const tokenMint = new PublicKey(config.token.mintAddress);
+            const tokenAccount = await getAssociatedTokenAddress(
+              tokenMint,
+              new PublicKey(publicKey)
+            );
+            
+            try {
+              const tokenAccountInfo = await connection.getTokenAccountBalance(tokenAccount);
+              setTokenBalance(
+                Number(tokenAccountInfo.value.amount) / Math.pow(10, config.token.decimals)
+              );
+            } catch (error) {
+              console.log('No token account found - balance is 0');
+              setTokenBalance(0);
+            }
+          }
         } catch (error) {
-          console.error('Error fetching balance:', error);
+          console.error('Error fetching balances:', error);
         }
       }
     };
 
     if (publicKey) {
-      fetchBalance();
-      const id = setInterval(fetchBalance, 10000);
+      fetchBalances();
+      const id = setInterval(fetchBalances, 10000);
       return () => clearInterval(id);
     }
   }, [publicKey, connection]);
@@ -104,15 +141,74 @@ export const SolanaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const sendTokens = async (recipientAddress: string, amount: number) => {
+    if (!privateKey || !publicKey || !config.token.mintAddress) {
+      throw new Error('Wallet not initialized or token not configured');
+    }
+
+    try {
+      const decodedPrivateKey = bs58.decode(privateKey);
+      const senderKeypair = Keypair.fromSecretKey(decodedPrivateKey);
+      const tokenMint = new PublicKey(config.token.mintAddress);
+      const recipientPublicKey = new PublicKey(recipientAddress);
+
+      // Get token accounts
+      const senderATA = await getAssociatedTokenAddress(
+        tokenMint,
+        senderKeypair.publicKey
+      );
+      const recipientATA = await getAssociatedTokenAddress(
+        tokenMint,
+        recipientPublicKey
+      );
+
+      const transaction = new Transaction();
+
+      // Check if recipient has an ATA and create if needed
+      try {
+        await connection.getTokenAccountBalance(recipientATA);
+      } catch {
+        transaction.add(
+          createAssociatedTokenAccountInstruction(
+            senderKeypair.publicKey,
+            recipientATA,
+            recipientPublicKey,
+            tokenMint
+          )
+        );
+      }
+
+      // Add token transfer instruction
+      transaction.add(
+        createTransferInstruction(
+          senderATA,
+          recipientATA,
+          senderKeypair.publicKey,
+          amount * Math.pow(10, config.token.decimals)
+        )
+      );
+
+      const signature = await connection.sendTransaction(transaction, [senderKeypair]);
+      await connection.confirmTransaction(signature);
+
+      return signature;
+    } catch (error) {
+      console.error('Error sending tokens:', error);
+      throw error;
+    }
+  };
+
   return (
     <SolanaContext.Provider
       value={{
         balance,
+        tokenBalance,
         publicKey,
         privateKey,
         createWallet,
         importWallet,
         sendTransaction,
+        sendTokens,
         connection,
       }}
     >

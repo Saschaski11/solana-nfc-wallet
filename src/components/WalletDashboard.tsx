@@ -5,9 +5,10 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Copy } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import config from '@/config/config';
 
 const WalletDashboard = () => {
-  const { balance, publicKey } = useSolana();
+  const { balance, tokenBalance, publicKey } = useSolana();
 
   const copyAddress = () => {
     if (publicKey) {
@@ -22,9 +23,16 @@ const WalletDashboard = () => {
     <div className="p-4 space-y-6">
       <Card className="p-6">
         <div className="space-y-4">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">Current Balance</p>
-            <h1 className="text-4xl font-bold">{balance.toFixed(2)} SOL</h1>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">SOL Balance</p>
+              <h2 className="text-2xl font-bold">{balance.toFixed(2)} SOL</h2>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">{config.token.symbol} Balance</p>
+              <h2 className="text-2xl font-bold">{tokenBalance.toFixed(2)} {config.token.symbol}</h2>
+            </div>
           </div>
 
           <div className="pt-4 border-t">
