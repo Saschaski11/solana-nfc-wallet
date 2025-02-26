@@ -14,10 +14,13 @@ const WalletCreation = () => {
     try {
       await createWallet();
       toast({
-        title: "Wallet Created",
+        title: "Success",
         description: "Your new wallet has been created successfully.",
       });
+      // Force page reload to update wallet state
+      window.location.reload();
     } catch (error) {
+      console.error('Error creating wallet:', error);
       toast({
         title: "Error",
         description: "Failed to create wallet. Please try again.",
@@ -39,11 +42,14 @@ const WalletCreation = () => {
     try {
       await importWallet(importKey);
       toast({
-        title: "Wallet Imported",
+        title: "Success",
         description: "Your wallet has been imported successfully.",
       });
       setImportKey('');
+      // Force page reload to update wallet state
+      window.location.reload();
     } catch (error) {
+      console.error('Error importing wallet:', error);
       toast({
         title: "Error",
         description: "Failed to import wallet. Please check your private key and try again.",
