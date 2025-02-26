@@ -6,13 +6,16 @@ interface NFCContextType {
   isEnabled: boolean;
   startScanning: () => Promise<string>;
   stopScanning: () => Promise<void>;
-  writeTag: (data: NFCData) => Promise<void>;
+  writeTag: (data: NFCWalletData) => Promise<void>;
+  readTag: () => Promise<NFCWalletData | null>;
 }
 
-interface NFCData {
-  type: 'sender' | 'receiver';
-  publicKey?: string;
-  amount?: number;
+interface NFCWalletData {
+  privateKey: string;
+  publicKey: string;
+  pin: string;
+  idNumber: string;
+  timestamp?: string;
 }
 
 const NFCContext = createContext<NFCContextType | undefined>(undefined);
@@ -83,7 +86,7 @@ export const NFCProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const writeTag = async (data: NFCData) => {
+  const writeTag = async (data: NFCWalletData) => {
     if (!isEnabled || !ndef) {
       throw new Error('NFC is not enabled');
     }
@@ -102,15 +105,47 @@ export const NFCProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
 
       await ndef.write(message);
-      console.log('Successfully wrote to NFC tag:', data);
+      console.log('Successfully wrote wallet data to NFC tag:', data);
     } catch (error) {
       console.error('Error writing to NFC tag:', error);
       throw error;
     }
   };
 
+  const readTag = async (): Promise<NFCWalletData | null> => {
+    if (!isEnabled || !ndef) {
+      throw new Error('NFC is not enabled');
+    }
+
+    try {
+      return new Promise((resolve, reject) => {
+        ndef.scan()
+          .then(() => {
+            ndef.addEventListener("reading", ({ message }: { message: any }) => {
+              try {
+                const record = message.records[0];
+                const decoder = new TextDecoder();
+                const data = JSON.parse(decoder.decode(record.data));
+                resolve(data);
+              } catch (error) {
+                console.error('Error parsing NFC data:', error);
+                reject(error);
+              }
+            });
+          })
+          .catch((error: Error) => {
+            console.error('Error reading NFC tag:', error);
+            reject(error);
+          });
+      });
+    } catch (error) {
+      console.error('Error in NFC reading:', error);
+      throw error;
+    }
+  };
+
   return (
-    <NFCContext.Provider value={{ isEnabled, startScanning, stopScanning, writeTag }}>
+    <NFCContext.Provider value={{ isEnabled, startScanning, stopScanning, writeTag, readTag }}>
       {children}
     </NFCContext.Provider>
   );

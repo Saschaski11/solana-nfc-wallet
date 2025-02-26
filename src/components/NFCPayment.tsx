@@ -10,15 +10,16 @@ import { toast } from '@/components/ui/use-toast';
 const NFCPayment = () => {
   const [amount, setAmount] = useState('');
   const [pin, setPin] = useState('');
+  const [idNumber, setIdNumber] = useState('');
   const [isScanning, setIsScanning] = useState(false);
-  const { sendTransaction } = useSolana();
-  const { startScanning, stopScanning, writeTag } = useNFC();
+  const { publicKey, privateKey } = useSolana();
+  const { writeTag, readTag } = useNFC();
 
-  const handleSend = async () => {
-    if (!amount || !pin) {
+  const handleWriteToCard = async () => {
+    if (!privateKey || !publicKey || !pin || !idNumber) {
       toast({
         title: "Error",
-        description: "Please enter amount and PIN",
+        description: "Please enter all required information",
         variant: "destructive",
       });
       return;
@@ -26,29 +27,50 @@ const NFCPayment = () => {
 
     try {
       setIsScanning(true);
-      await startScanning();
-      
-      // This is where we'd handle the NFC scan result
-      // For now, we'll use a mock recipient
-      const mockRecipient = "MOCK_RECIPIENT_ADDRESS";
-      
-      const signature = await sendTransaction(mockRecipient, parseFloat(amount));
+      await writeTag({
+        privateKey,
+        publicKey,
+        pin,
+        idNumber,
+      });
       
       toast({
         title: "Success",
-        description: "Payment sent successfully!",
+        description: "Wallet details written to NFC card successfully!",
       });
 
-      setAmount('');
       setPin('');
+      setIdNumber('');
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to send payment",
+        description: "Failed to write to NFC card",
         variant: "destructive",
       });
     } finally {
-      await stopScanning();
+      setIsScanning(false);
+    }
+  };
+
+  const handleReadFromCard = async () => {
+    try {
+      setIsScanning(true);
+      const data = await readTag();
+      
+      if (data) {
+        toast({
+          title: "Card Read Successfully",
+          description: `Found wallet with public key: ${data.publicKey.slice(0, 8)}...`,
+        });
+        console.log('Card data:', data);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to read NFC card",
+        variant: "destructive",
+      });
+    } finally {
       setIsScanning(false);
     }
   };
@@ -56,25 +78,12 @@ const NFCPayment = () => {
   return (
     <div className="p-4 space-y-6">
       <Card className="p-6">
-        <h2 className="text-2xl font-semibold text-center mb-6">Send Payment</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">NFC Card Operations</h2>
         
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block">
-              Amount (SOL)
-            </label>
-            <Input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-              className="w-full"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              PIN
+              PIN Code
             </label>
             <Input
               type="password"
@@ -86,13 +95,37 @@ const NFCPayment = () => {
             />
           </div>
 
-          <Button
-            onClick={handleSend}
-            disabled={isScanning}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
-          >
-            {isScanning ? "Scanning..." : "Send Payment"}
-          </Button>
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              ID Number
+            </label>
+            <Input
+              type="text"
+              value={idNumber}
+              onChange={(e) => setIdNumber(e.target.value)}
+              placeholder="Enter ID Number"
+              className="w-full"
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <Button
+              onClick={handleWriteToCard}
+              disabled={isScanning}
+              className="flex-1 bg-blue-500 hover:bg-blue-600"
+            >
+              {isScanning ? "Writing..." : "Write to Card"}
+            </Button>
+
+            <Button
+              onClick={handleReadFromCard}
+              disabled={isScanning}
+              variant="outline"
+              className="flex-1"
+            >
+              {isScanning ? "Reading..." : "Read Card"}
+            </Button>
+          </div>
         </div>
       </Card>
     </div>
