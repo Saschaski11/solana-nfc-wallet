@@ -5,7 +5,6 @@ import { NFCProvider } from '@/lib/NFCContext';
 import WalletCreation from '@/components/WalletCreation';
 import WalletDashboard from '@/components/WalletDashboard';
 import NFCPayment from '@/components/NFCPayment';
-import { Wallet, Shield } from 'lucide-react';
 
 const Index = () => {
   const [hasWallet, setHasWallet] = useState(false);
@@ -22,7 +21,11 @@ const Index = () => {
           <div className="container mx-auto max-w-md px-4 pb-8">
             <div className="pt-8 pb-6">
               <div className="flex items-center justify-center gap-2">
-                <Shield className="h-8 w-8 text-[#9b87f5]" />
+                <img 
+                  src="/lovable-uploads/194b2393-6237-4c28-abfe-0af79aad43b6.png" 
+                  alt="Solana Tap Logo" 
+                  className="h-10 w-10"
+                />
                 <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-[#9b87f5] to-[#D6BCFA] bg-clip-text text-transparent">
                   Solana Tap
                 </h1>
