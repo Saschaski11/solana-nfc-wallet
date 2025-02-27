@@ -14,7 +14,7 @@ interface NFCWalletData {
   privateKey: string;
   publicKey: string;
   pin: string;
-  idNumber: string;
+  idNumber: string;  // Keeping in the interface for compatibility, but we won't require it
   timestamp?: string;
 }
 

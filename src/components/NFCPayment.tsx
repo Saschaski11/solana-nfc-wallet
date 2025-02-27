@@ -10,16 +10,15 @@ import { toast } from '@/components/ui/use-toast';
 const NFCPayment = () => {
   const [amount, setAmount] = useState('');
   const [pin, setPin] = useState('');
-  const [idNumber, setIdNumber] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const { publicKey, privateKey } = useSolana();
   const { writeTag, readTag } = useNFC();
 
   const handleWriteToCard = async () => {
-    if (!privateKey || !publicKey || !pin || !idNumber) {
+    if (!privateKey || !publicKey || !pin) {
       toast({
         title: "Error",
-        description: "Please enter all required information",
+        description: "Please enter your PIN code",
         variant: "destructive",
       });
       return;
@@ -31,7 +30,7 @@ const NFCPayment = () => {
         privateKey,
         publicKey,
         pin,
-        idNumber,
+        idNumber: "" // We're no longer requiring an ID number
       });
       
       toast({
@@ -40,7 +39,6 @@ const NFCPayment = () => {
       });
 
       setPin('');
-      setIdNumber('');
     } catch (error) {
       toast({
         title: "Error",
@@ -92,19 +90,6 @@ const NFCPayment = () => {
               placeholder="Enter PIN"
               className="w-full"
               maxLength={4}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              ID Number
-            </label>
-            <Input
-              type="text"
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
-              placeholder="Enter ID Number"
-              className="w-full"
             />
           </div>
 
