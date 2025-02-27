@@ -5,7 +5,7 @@ import PaymentOperations from './PaymentOperations';
 
 const NFCPayment = () => {
   return (
-    <div className="p-4 space-y-6">
+    <div className="space-y-6">
       <NFCCardOperations />
       <PaymentOperations />
     </div>

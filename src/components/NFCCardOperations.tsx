@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { toast } from '@/components/ui/use-toast';
+import { CreditCard, ScanLine } from 'lucide-react';
 
 const NFCCardOperations = () => {
   const [pin, setPin] = useState('');
@@ -73,12 +74,15 @@ const NFCCardOperations = () => {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold text-center mb-6">NFC Card Operations</h2>
+    <Card className="p-6 mx-4 bg-gradient-to-br from-[#1E293B] to-[#162037] border-[#ffffff10]">
+      <div className="text-center mb-6">
+        <CreditCard className="h-6 w-6 mx-auto mb-2 text-[#9b87f5]" />
+        <h2 className="text-xl font-bold text-[#9b87f5]">NFC Card Operations</h2>
+      </div>
       
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">
+          <label className="text-sm font-medium mb-2 block text-gray-300">
             PIN Code
           </label>
           <Input
@@ -86,7 +90,7 @@ const NFCCardOperations = () => {
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             placeholder="Enter PIN"
-            className="w-full"
+            className="w-full bg-[#1A1F2C]/60 border-[#ffffff10] text-white placeholder:text-gray-500"
             maxLength={4}
           />
         </div>
@@ -95,7 +99,7 @@ const NFCCardOperations = () => {
           <Button
             onClick={handleWriteToCard}
             disabled={isScanning}
-            className="flex-1 bg-blue-500 hover:bg-blue-600"
+            className="flex-1 bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
           >
             {isScanning ? "Writing..." : "Write to Card"}
           </Button>
@@ -104,8 +108,9 @@ const NFCCardOperations = () => {
             onClick={handleReadFromCard}
             disabled={isScanning}
             variant="outline"
-            className="flex-1"
+            className="flex-1 border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/20"
           >
+            <ScanLine className="mr-2 h-4 w-4" />
             {isScanning ? "Reading..." : "Read Card"}
           </Button>
         </div>
