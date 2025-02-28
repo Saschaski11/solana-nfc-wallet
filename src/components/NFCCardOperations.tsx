@@ -74,7 +74,7 @@ const NFCCardOperations = () => {
   };
 
   return (
-    <Card className="p-6 mx-4 bg-gradient-to-br from-[#1E293B] to-[#162037] border-[#ffffff10] shadow-lg rounded-xl">
+    <Card className="p-6 mx-4 bg-[#1A1F2C]/80 border-[#ffffff10] rounded-xl">
       <div className="text-center mb-6">
         <div className="bg-[#9b87f5]/10 p-3 rounded-full inline-block mb-3">
           <ShieldCheck className="h-6 w-6 text-[#9b87f5]" />
@@ -93,7 +93,7 @@ const NFCCardOperations = () => {
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             placeholder="Enter PIN"
-            className="w-full bg-[#1A1F2C]/90 border-[#ffffff10] text-white placeholder:text-gray-500"
+            className="w-full bg-[#121420]/70 border-[#ffffff10] text-white placeholder:text-gray-500"
             maxLength={4}
           />
         </div>

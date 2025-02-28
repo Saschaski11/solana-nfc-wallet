@@ -26,14 +26,10 @@ const WalletDashboard = () => {
 
   return (
     <div className="px-4 pt-4 pb-2">
-      <Card className="p-6 bg-gradient-to-br from-[#1E293B] to-[#162037] border-[#ffffff10]">
+      <Card className="p-6 bg-[#1A1F2C]/80 border-[#ffffff10] rounded-xl">
         <div className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-[#9b87f5] mb-4">Your Assets</h2>
-          </div>
-          
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 rounded-xl bg-[#1A1F2C]/90 border border-[#ffffff10] shadow-lg">
+            <div className="text-center p-4 rounded-xl bg-[#121420]/70 border border-[#ffffff10]">
               <div className="flex justify-center mb-2">
                 <ArrowUp className="h-5 w-5 text-[#9b87f5]" />
                 <ArrowDown className="h-5 w-5 text-[#9b87f5] ml-1" />
@@ -43,7 +39,7 @@ const WalletDashboard = () => {
               <p className="text-xs text-gray-500 mt-1">{balance.toFixed(4)} SOL</p>
             </div>
             
-            <div className="text-center p-4 rounded-xl bg-[#1A1F2C]/90 border border-[#ffffff10] shadow-lg">
+            <div className="text-center p-4 rounded-xl bg-[#121420]/70 border border-[#ffffff10]">
               <div className="flex justify-center mb-2">
                 <Coins className="h-5 w-5 text-[#9b87f5]" />
               </div>
@@ -55,7 +51,7 @@ const WalletDashboard = () => {
 
           <div className="pt-4 border-t border-[#ffffff10]">
             <p className="text-sm text-gray-400 mb-2">Wallet Address</p>
-            <div className="flex items-center gap-2 bg-[#1A1F2C]/90 p-3 rounded-lg">
+            <div className="flex items-center gap-2 bg-[#121420]/70 p-3 rounded-lg">
               <code className="flex-1 text-xs truncate text-gray-300">
                 {publicKey}
               </code>
