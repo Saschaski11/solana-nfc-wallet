@@ -126,28 +126,8 @@ const Index = () => {
               <WalletCreation />
             ) : (
               <div className="flex flex-col h-screen">
-                {/* Top header with search bar */}
+                {/* Top header - simplified without buttons and logo */}
                 <div className="pt-8 px-4 pb-2 md:pt-10">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                        <img 
-                          src="/lovable-uploads/194b2393-6237-4c28-abfe-0af79aad43b6.png" 
-                          alt="Solana Tap Logo" 
-                          className="h-6 w-6"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="bg-[#9b87f5]/20 p-2 rounded-full cursor-pointer hover:bg-[#9b87f5]/30 transition-colors">
-                        <div className="h-5 w-5 text-[#9b87f5]">≡</div>
-                      </div>
-                      <div className="bg-[#9b87f5]/20 p-2 rounded-full cursor-pointer hover:bg-[#9b87f5]/30 transition-colors">
-                        <div className="h-5 w-5 text-[#9b87f5]">☰</div>
-                      </div>
-                    </div>
-                  </div>
-                  
                   <div className="mt-4 relative">
                     <div className="flex justify-center">
                       <p className="text-sm text-gray-400">Main • SOL</p>
@@ -155,12 +135,6 @@ const Index = () => {
                     <div className="text-center mt-2">
                       <h1 className="text-5xl md:text-6xl font-bold">SOL</h1>
                     </div>
-                  </div>
-
-                  <div className="mt-6 mb-4 flex justify-center">
-                    <button className="bg-[#9b87f5]/20 text-[#9b87f5] rounded-full py-2 px-8 hover:bg-[#9b87f5]/30 transition-colors">
-                      Accounts
-                    </button>
                   </div>
                 </div>
                 
