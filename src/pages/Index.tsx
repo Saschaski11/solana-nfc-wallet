@@ -6,6 +6,7 @@ import WalletCreation from '@/components/WalletCreation';
 import WalletDashboard from '@/components/WalletDashboard';
 import NFCPayment from '@/components/NFCPayment';
 import NavBar from '@/components/NavBar';
+import { Repeat } from 'lucide-react';
 
 const Index = () => {
   const [hasWallet, setHasWallet] = useState(false);
@@ -106,9 +107,6 @@ const Index = () => {
         return <WalletDashboard />;
     }
   };
-
-  // Import necessary icons
-  const { Repeat } = require('lucide-react');
 
   return (
     <SolanaProvider>
