@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSolana } from '@/lib/SolanaContext';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -15,6 +15,13 @@ const WalletDashboard = () => {
   const transactionFee = 0.000005;
   const transactionsLeft = Math.floor(balance / transactionFee);
 
+  // Store wallet address in localStorage for other components to use
+  useEffect(() => {
+    if (publicKey) {
+      localStorage.setItem('walletAddress', publicKey);
+    }
+  }, [publicKey]);
+
   const copyAddress = () => {
     if (publicKey) {
       navigator.clipboard.writeText(publicKey);
@@ -28,7 +35,7 @@ const WalletDashboard = () => {
     <div className="px-4 pt-4 pb-2">
       <Card className="p-6 bg-[#1A1F2C]/80 border-[#ffffff10] rounded-xl">
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="text-center p-4 rounded-xl bg-[#121420]/70 border border-[#ffffff10]">
               <div className="flex justify-center mb-2">
                 <ArrowUp className="h-5 w-5 text-[#9b87f5]" />

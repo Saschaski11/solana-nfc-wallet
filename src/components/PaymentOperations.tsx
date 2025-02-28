@@ -6,14 +6,15 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { ArrowUpRight, ArrowDownLeft, Repeat } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Repeat, QrCode } from 'lucide-react';
 
 const PaymentOperations = () => {
   const [amount, setAmount] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
-  const { publicKey, sendTransaction } = useSolana();
-  const { readTag } = useNFC();
+  const [showQR, setShowQR] = useState(false);
+  const { publicKey, sendTransaction, balance } = useSolana();
+  const { readTag, isEnabled } = useNFC();
 
   const handleReceivePayment = async () => {
     if (!publicKey) {
@@ -25,6 +26,20 @@ const PaymentOperations = () => {
       return;
     }
 
+    setIsReceiving(true);
+    setShowQR(true);
+    toast({
+      title: "Ready to Receive",
+      description: "Show this QR code to the sender to receive payment",
+    });
+
+    // In a real app, this would set up a listener for incoming transactions
+    setTimeout(() => {
+      setIsReceiving(false);
+    }, 3000);
+  };
+
+  const handleSendPayment = async () => {
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
       toast({
         title: "Error",
@@ -34,34 +49,32 @@ const PaymentOperations = () => {
       return;
     }
 
-    try {
-      setIsReceiving(true);
+    const amountValue = parseFloat(amount);
+    if (amountValue > balance) {
       toast({
-        title: "Ready to Receive",
-        description: "Ask the sender to scan your wallet and approve the payment",
-      });
-
-      // In a real app, this would involve setting up a listener or polling mechanism
-      setTimeout(() => {
-        toast({
-          title: "Instructions",
-          description: "Show your receiving QR code or NFC card to the sender",
-        });
-      }, 2000);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to set up payment receiver",
+        title: "Insufficient Balance",
+        description: "You don't have enough SOL to send this amount",
         variant: "destructive",
       });
-    } finally {
-      setIsReceiving(false);
+      return;
     }
-  };
 
-  const handleSendPayment = async () => {
+    if (!isEnabled) {
+      toast({
+        title: "NFC Not Available",
+        description: "NFC is not available on this device. Please manually enter recipient address.",
+        variant: "destructive",
+      });
+      // In a real app, we would offer a manual address input option here
+      return;
+    }
+
     try {
       setIsScanning(true);
+      toast({
+        description: "Please tap the recipient's NFC card",
+      });
+      
       const data = await readTag();
       
       if (!data || !data.publicKey) {
@@ -73,19 +86,10 @@ const PaymentOperations = () => {
         return;
       }
 
-      if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
-        toast({
-          title: "Error",
-          description: "Please enter a valid amount",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Ask for confirmation before sending
       if (confirm(`Send ${amount} SOL to ${data.publicKey.slice(0, 8)}...?`)) {
         try {
-          const signature = await sendTransaction(data.publicKey, parseFloat(amount));
+          const signature = await sendTransaction(data.publicKey, amountValue);
           
           toast({
             title: "Payment Sent!",
@@ -103,9 +107,10 @@ const PaymentOperations = () => {
         }
       }
     } catch (error) {
+      console.error('Error in payment process:', error);
       toast({
         title: "Error",
-        description: "Failed to read NFC card",
+        description: "Failed to complete payment. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -123,43 +128,65 @@ const PaymentOperations = () => {
         <p className="text-xs text-gray-400 mt-1">Send or receive SOL payments</p>
       </div>
       
-      <div className="space-y-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block text-gray-300">
-            Amount (SOL)
-          </label>
-          <Input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Enter amount"
-            className="w-full bg-[#121420]/70 border-[#ffffff10] text-white placeholder:text-gray-500"
-            min="0"
-            step="0.01"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 pt-2">
+      {showQR ? (
+        <div className="space-y-4">
+          <div className="flex justify-center p-4 bg-white rounded-lg">
+            <div className="w-48 h-48 bg-gray-200 flex items-center justify-center">
+              {/* Placeholder for QR code - in a real app you'd generate this */}
+              <div className="text-black text-xs text-center p-2">
+                <QrCode className="w-12 h-12 mx-auto mb-2 text-gray-700" />
+                <p className="break-all">
+                  {publicKey?.substring(0, 20)}...
+                </p>
+              </div>
+            </div>
+          </div>
           <Button
-            onClick={handleSendPayment}
-            disabled={isScanning || isReceiving}
-            className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
+            onClick={() => setShowQR(false)}
+            className="w-full bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
           >
-            <ArrowUpRight className="mr-2 h-4 w-4" />
-            {isScanning ? "Sending..." : "Send"}
-          </Button>
-
-          <Button
-            onClick={handleReceivePayment}
-            disabled={isScanning || isReceiving}
-            variant="outline"
-            className="border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/20"
-          >
-            <ArrowDownLeft className="mr-2 h-4 w-4" />
-            {isReceiving ? "Receiving..." : "Receive"}
+            Done
           </Button>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block text-gray-300">
+              Amount (SOL)
+            </label>
+            <Input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Enter amount"
+              className="w-full bg-[#121420]/70 border-[#ffffff10] text-white placeholder:text-gray-500"
+              min="0.000001"
+              step="0.01"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <Button
+              onClick={handleSendPayment}
+              disabled={isScanning || isReceiving}
+              className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
+            >
+              <ArrowUpRight className="mr-2 h-4 w-4" />
+              {isScanning ? "Scanning..." : "Send"}
+            </Button>
+
+            <Button
+              onClick={handleReceivePayment}
+              disabled={isScanning || isReceiving}
+              variant="outline"
+              className="border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/20"
+            >
+              <ArrowDownLeft className="mr-2 h-4 w-4" />
+              {isReceiving ? "Generating..." : "Receive"}
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

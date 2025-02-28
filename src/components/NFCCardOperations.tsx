@@ -12,7 +12,7 @@ const NFCCardOperations = () => {
   const [pin, setPin] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const { publicKey, privateKey } = useSolana();
-  const { writeTag, readTag } = useNFC();
+  const { writeTag, readTag, isEnabled } = useNFC();
 
   const handleWriteToCard = async () => {
     if (!privateKey || !publicKey || !pin) {
@@ -23,9 +23,22 @@ const NFCCardOperations = () => {
       });
       return;
     }
+    
+    if (!isEnabled) {
+      toast({
+        title: "NFC Not Available",
+        description: "NFC is not available on this device or is disabled.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setIsScanning(true);
+      toast({
+        description: "Please tap your NFC card to write wallet data",
+      });
+      
       await writeTag({
         privateKey,
         publicKey,
@@ -40,9 +53,10 @@ const NFCCardOperations = () => {
 
       setPin('');
     } catch (error) {
+      console.error('Error writing to card:', error);
       toast({
         title: "Error",
-        description: "Failed to write to NFC card",
+        description: "Failed to write to NFC card. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -51,8 +65,21 @@ const NFCCardOperations = () => {
   };
 
   const handleReadFromCard = async () => {
+    if (!isEnabled) {
+      toast({
+        title: "NFC Not Available",
+        description: "NFC is not available on this device or is disabled.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsScanning(true);
+      toast({
+        description: "Please tap your NFC card to read wallet data",
+      });
+      
       const data = await readTag();
       
       if (data) {
@@ -63,9 +90,10 @@ const NFCCardOperations = () => {
         console.log('Card data:', data);
       }
     } catch (error) {
+      console.error('Error reading card:', error);
       toast({
         title: "Error",
-        description: "Failed to read NFC card",
+        description: "Failed to read NFC card. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -98,7 +126,7 @@ const NFCCardOperations = () => {
           />
         </div>
 
-        <div className="flex gap-4 pt-2">
+        <div className="flex flex-col sm:flex-row gap-4 pt-2">
           <Button
             onClick={handleWriteToCard}
             disabled={isScanning}
@@ -118,6 +146,14 @@ const NFCCardOperations = () => {
             {isScanning ? "Reading..." : "Read Card"}
           </Button>
         </div>
+        
+        {!isEnabled && (
+          <div className="mt-2 text-center">
+            <p className="text-xs text-yellow-400">
+              NFC capability not detected. Please ensure NFC is enabled on your device.
+            </p>
+          </div>
+        )}
       </div>
     </Card>
   );

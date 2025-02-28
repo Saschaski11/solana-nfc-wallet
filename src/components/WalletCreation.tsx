@@ -9,10 +9,12 @@ import { Wallet, Import, LockKeyhole } from 'lucide-react';
 
 const WalletCreation = () => {
   const [importKey, setImportKey] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { createWallet, importWallet } = useSolana();
 
   const handleCreate = async () => {
     try {
+      setIsLoading(true);
       await createWallet();
       toast({
         title: "Success",
@@ -27,6 +29,8 @@ const WalletCreation = () => {
         description: "Failed to create wallet. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,6 +45,7 @@ const WalletCreation = () => {
     }
 
     try {
+      setIsLoading(true);
       await importWallet(importKey);
       toast({
         title: "Success",
@@ -56,11 +61,13 @@ const WalletCreation = () => {
         description: "Failed to import wallet. Please check your private key and try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 max-w-lg mx-auto">
       <div className="text-center mb-2">
         <LockKeyhole className="h-10 w-10 mx-auto mb-3 text-[#9b87f5]" />
         <h2 className="text-2xl font-bold text-[#9b87f5]">Create or Import Wallet</h2>
@@ -75,9 +82,10 @@ const WalletCreation = () => {
           </h3>
           <Button 
             onClick={handleCreate}
+            disabled={isLoading}
             className="w-full bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:from-[#7E69AB] hover:to-[#6a5a92] text-white"
           >
-            Create Wallet
+            {isLoading ? "Creating..." : "Create Wallet"}
           </Button>
           <p className="text-xs text-gray-400 mt-2 text-center">Creates a new Solana wallet with a random seed</p>
         </div>
@@ -106,10 +114,11 @@ const WalletCreation = () => {
             />
             <Button 
               onClick={handleImport}
+              disabled={isLoading}
               variant="outline" 
               className="w-full border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/20"
             >
-              Import Wallet
+              {isLoading ? "Importing..." : "Import Wallet"}
             </Button>
           </div>
         </div>
