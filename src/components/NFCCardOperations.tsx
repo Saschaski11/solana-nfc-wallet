@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { CreditCard, ScanLine } from 'lucide-react';
+import { CreditCard, ScanLine, ShieldCheck } from 'lucide-react';
 
 const NFCCardOperations = () => {
   const [pin, setPin] = useState('');
@@ -74,33 +74,37 @@ const NFCCardOperations = () => {
   };
 
   return (
-    <Card className="p-6 mx-4 bg-gradient-to-br from-[#1E293B] to-[#162037] border-[#ffffff10]">
+    <Card className="p-6 mx-4 bg-gradient-to-br from-[#1E293B] to-[#162037] border-[#ffffff10] shadow-lg rounded-xl">
       <div className="text-center mb-6">
-        <CreditCard className="h-6 w-6 mx-auto mb-2 text-[#9b87f5]" />
-        <h2 className="text-xl font-bold text-[#9b87f5]">NFC Card Operations</h2>
+        <div className="bg-[#9b87f5]/10 p-3 rounded-full inline-block mb-3">
+          <ShieldCheck className="h-6 w-6 text-[#9b87f5]" />
+        </div>
+        <h2 className="text-xl font-bold text-[#9b87f5]">NFC Security</h2>
+        <p className="text-xs text-gray-400 mt-1">Write or read wallet data on NFC cards</p>
       </div>
       
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium mb-2 block text-gray-300">
-            PIN Code
+            Security PIN
           </label>
           <Input
             type="password"
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             placeholder="Enter PIN"
-            className="w-full bg-[#1A1F2C]/60 border-[#ffffff10] text-white placeholder:text-gray-500"
+            className="w-full bg-[#1A1F2C]/90 border-[#ffffff10] text-white placeholder:text-gray-500"
             maxLength={4}
           />
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 pt-2">
           <Button
             onClick={handleWriteToCard}
             disabled={isScanning}
             className="flex-1 bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
           >
+            <CreditCard className="mr-2 h-4 w-4" />
             {isScanning ? "Writing..." : "Write to Card"}
           </Button>
 

@@ -33,7 +33,7 @@ const Index = () => {
               <p className="text-center text-gray-400 mt-2">Secure NFC Wallet</p>
             </div>
             
-            <div className="rounded-2xl overflow-hidden backdrop-blur-md bg-[#1E293B]/70 border border-[#ffffff10] shadow-xl animate-fade-in">
+            <div className="animate-fade-in">
               {!hasWallet ? (
                 <WalletCreation />
               ) : (

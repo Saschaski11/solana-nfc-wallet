@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { toast } from '@/components/ui/use-toast';
+import { ArrowUpRight, ArrowDownLeft, Repeat } from 'lucide-react';
 
 const PaymentOperations = () => {
   const [amount, setAmount] = useState('');
@@ -113,12 +114,18 @@ const PaymentOperations = () => {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold text-center mb-6">Payment Operations</h2>
+    <Card className="p-6 mx-4 mb-4 bg-gradient-to-br from-[#1E293B] to-[#162037] border-[#ffffff10] shadow-lg rounded-xl">
+      <div className="text-center mb-6">
+        <div className="bg-[#9b87f5]/10 p-3 rounded-full inline-block mb-3">
+          <Repeat className="h-6 w-6 text-[#9b87f5]" />
+        </div>
+        <h2 className="text-xl font-bold text-[#9b87f5]">Transactions</h2>
+        <p className="text-xs text-gray-400 mt-1">Send or receive SOL payments</p>
+      </div>
       
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">
+          <label className="text-sm font-medium mb-2 block text-gray-300">
             Amount (SOL)
           </label>
           <Input
@@ -126,27 +133,30 @@ const PaymentOperations = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Enter amount"
-            className="w-full"
+            className="w-full bg-[#1A1F2C]/90 border-[#ffffff10] text-white placeholder:text-gray-500"
             min="0"
             step="0.01"
           />
         </div>
 
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-4 pt-2">
           <Button
             onClick={handleSendPayment}
             disabled={isScanning || isReceiving}
-            className="flex-1 bg-green-500 hover:bg-green-600"
+            className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white"
           >
-            {isScanning ? "Processing..." : "Send Payment"}
+            <ArrowUpRight className="mr-2 h-4 w-4" />
+            {isScanning ? "Sending..." : "Send"}
           </Button>
 
           <Button
             onClick={handleReceivePayment}
             disabled={isScanning || isReceiving}
-            className="flex-1 bg-purple-500 hover:bg-purple-600"
+            variant="outline"
+            className="border-[#9b87f5] text-[#9b87f5] hover:bg-[#9b87f5]/20"
           >
-            {isReceiving ? "Waiting..." : "Receive Payment"}
+            <ArrowDownLeft className="mr-2 h-4 w-4" />
+            {isReceiving ? "Receiving..." : "Receive"}
           </Button>
         </div>
       </div>
