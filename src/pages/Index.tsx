@@ -126,20 +126,8 @@ const Index = () => {
               <WalletCreation />
             ) : (
               <div className="flex flex-col h-screen">
-                {/* Top header - simplified without buttons and logo */}
-                <div className="pt-8 px-4 pb-2 md:pt-10">
-                  <div className="mt-4 relative">
-                    <div className="flex justify-center">
-                      <p className="text-sm text-gray-400">Main • SOL</p>
-                    </div>
-                    <div className="text-center mt-2">
-                      <h1 className="text-5xl md:text-6xl font-bold">SOL</h1>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Main content */}
-                <div className="flex-1 overflow-auto pb-20">
+                {/* Main content with removed top header */}
+                <div className="flex-1 overflow-auto pb-20 pt-4">
                   {renderContent()}
                 </div>
                 
