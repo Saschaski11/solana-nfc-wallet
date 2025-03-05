@@ -1,26 +1,70 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useSolana } from '@/lib/SolanaContext';
+import { Copy, QrCode } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 const AddMoneyView = () => {
+  const { publicKey } = useSolana();
+  const [showQR, setShowQR] = useState(false);
+
+  const copyAddress = () => {
+    if (publicKey) {
+      navigator.clipboard.writeText(publicKey);
+      toast({
+        description: "Address copied to clipboard",
+      });
+    }
+  };
+
+  // Short display version of public key
+  const shortPublicKey = publicKey ? 
+    `${publicKey.slice(0, 8)}...${publicKey.slice(-8)}` : 
+    'Loading...';
+
   return (
-    <div className="p-6 mx-4 bg-[#1A1F2C]/80 rounded-xl border border-[#ffffff10] shadow-lg backdrop-blur-sm animate-fade-in">
-      <h2 className="text-xl font-bold text-center text-[#9b87f5] mb-4">Add Money</h2>
-      <p className="text-gray-300 text-center">To add SOL to your wallet, send funds to your wallet address.</p>
-      <div className="mt-6 p-4 bg-[#121420]/70 rounded-lg border border-[#ffffff10]">
-        <p className="text-sm text-gray-400 mb-2">Your wallet address:</p>
-        <p className="text-xs text-gray-300 break-all bg-[#0c0e16] p-3 rounded-md">{localStorage.getItem('walletAddress') || 'Loading address...'}</p>
-      </div>
-      <div className="mt-6 flex justify-center">
-        <div className="bg-[#9b87f5]/10 p-4 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#9b87f5]">
-            <rect width="18" height="18" x="3" y="3" rx="2" />
-            <path d="M7 7h.01" />
-            <path d="M7 17h.01" />
-            <path d="M17 7h.01" />
-            <path d="M17 17h.01" />
-            <path d="M12 12h.01" />
-          </svg>
+    <div className="p-6 animate-fade-in">
+      <h2 className="text-xl font-bold text-center mb-6">Receive</h2>
+      
+      {/* QR Code Section */}
+      <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 flex flex-col items-center">
+        <div className="w-48 h-48 bg-white p-3 rounded-lg mb-6 flex items-center justify-center">
+          {showQR ? (
+            <div className="bg-[#f5f5f5] w-full h-full flex items-center justify-center">
+              <QrCode size={120} className="text-gray-800" />
+            </div>
+          ) : (
+            <QrCode size={120} className="text-gray-800" />
+          )}
         </div>
+        
+        <p className="text-center text-gray-300 mb-4 max-w-xs">
+          Send only Solana (SOL) to this address. Other tokens may be lost forever.
+        </p>
+        
+        <div className="w-full bg-white/5 p-3 rounded-lg flex items-center justify-between mb-4">
+          <span className="text-sm font-mono">{shortPublicKey}</span>
+          <button 
+            onClick={copyAddress}
+            className="p-1.5 bg-[#9b87f5]/20 hover:bg-[#9b87f5]/30 rounded-full"
+          >
+            <Copy size={14} className="text-[#9b87f5]" />
+          </button>
+        </div>
+        
+        <button 
+          onClick={copyAddress}
+          className="w-full bg-[#9b87f5] hover:bg-[#8a75e3] text-white py-3 rounded-xl font-medium transition-colors"
+        >
+          Copy Full Address
+        </button>
+      </div>
+      
+      {/* Additional Info */}
+      <div className="mt-8 bg-blue-500/10 backdrop-blur-md rounded-xl border border-blue-500/20 p-5">
+        <p className="text-sm text-center text-gray-300">
+          After sending funds, they will appear in your wallet once the transaction is processed on the blockchain.
+        </p>
       </div>
     </div>
   );
