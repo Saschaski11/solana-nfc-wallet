@@ -16,24 +16,28 @@ const NavBar: React.FC<NavBarProps> = ({ onNavItemClick, activeView }) => {
           label="Home" 
           isActive={activeView === 'dashboard'}
           onClick={() => onNavItemClick('dashboard')}
+          view="dashboard"
         />
         <NavItem 
           icon={<ArrowUpDown size={22} />} 
           label="Swap" 
           isActive={activeView === 'exchange'}
           onClick={() => onNavItemClick('exchange')}
+          view="exchange"
         />
         <NavItem 
           icon={<Wallet size={22} />} 
           label="Wallet" 
           isActive={activeView === 'details'}
           onClick={() => onNavItemClick('details')}
+          view="details"
         />
         <NavItem 
           icon={<Settings size={22} />} 
           label="Settings" 
           isActive={activeView === 'more'}
           onClick={() => onNavItemClick('more')}
+          view="more"
         />
       </div>
     </div>
@@ -45,13 +49,15 @@ interface NavItemProps {
   label: string;
   isActive: boolean;
   onClick: () => void;
+  view: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => {
+const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick, view }) => {
   return (
     <div 
-      className="flex flex-col items-center cursor-pointer transition-all py-1"
+      className="flex flex-col items-center cursor-pointer transition-all py-1 navbar-button"
       onClick={onClick}
+      data-view={view}
     >
       <div className={`mb-1 ${isActive ? 'text-[#9b87f5]' : 'text-gray-400'}`}>
         {icon}

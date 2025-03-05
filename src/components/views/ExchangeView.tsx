@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useSolana } from '@/lib/SolanaContext';
-import { ArrowDown, Search } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import config from '@/config/config';
 
 const ExchangeView = () => {
@@ -82,66 +82,8 @@ const ExchangeView = () => {
       <button className="w-full mt-6 bg-gradient-to-r from-[#9b87f5] to-purple-500 text-white py-3 px-6 rounded-xl font-medium">
         Swap
       </button>
-      
-      {/* More Info */}
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Popular Tokens</h3>
-        </div>
-        
-        <div className="space-y-3">
-          <TokenItem 
-            symbol="SOL" 
-            name="Solana" 
-            balance={balance} 
-            dollarValue={balance * 20} // Example price
-            change={"+2.43%"}
-            color="bg-blue-500"
-          />
-          <TokenItem 
-            symbol={config.token.symbol} 
-            name={config.token.name} 
-            balance={tokenBalance} 
-            dollarValue={tokenBalance * 0.1} // Example price
-            change={"+5.17%"}
-            color="bg-purple-500"
-          />
-        </div>
-      </div>
     </div>
   );
 };
-
-const TokenItem = ({ 
-  symbol, 
-  name, 
-  balance, 
-  dollarValue, 
-  change, 
-  color 
-}: { 
-  symbol: string; 
-  name: string; 
-  balance: number; 
-  dollarValue: number;
-  change: string;
-  color: string;
-}) => (
-  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
-    <div className="flex items-center space-x-3">
-      <div className={`w-8 h-8 ${color} rounded-full flex items-center justify-center text-white font-bold text-xs`}>
-        {symbol.slice(0, 2)}
-      </div>
-      <div>
-        <div className="font-medium">{name}</div>
-        <div className="text-gray-400 text-xs">{symbol}</div>
-      </div>
-    </div>
-    <div className="text-right">
-      <div className="font-medium">${dollarValue.toFixed(2)}</div>
-      <div className="text-green-400 text-xs">{change}</div>
-    </div>
-  </div>
-);
 
 export default ExchangeView;

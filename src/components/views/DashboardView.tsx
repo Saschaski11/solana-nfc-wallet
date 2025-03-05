@@ -21,6 +21,19 @@ const DashboardView = () => {
     `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}` : 
     'Loading...';
 
+  // Function to navigate to different views
+  const navigateToView = (view: string) => {
+    const appElement = document.querySelector('.min-h-screen');
+    if (appElement) {
+      const navButtons = appElement.querySelectorAll('.navbar-button');
+      navButtons.forEach(button => {
+        if ((button as HTMLElement).dataset.view === view) {
+          (button as HTMLElement).click();
+        }
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in px-4 pt-6">
       {/* Profile Header */}
@@ -57,11 +70,10 @@ const DashboardView = () => {
       </div>
       
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-3 mt-6">
-        <QuickAction icon="💳" label="Add" />
-        <QuickAction icon="↔️" label="Swap" />
-        <QuickAction icon="⬇️" label="Receive" />
-        <QuickAction icon="⬆️" label="Send" />
+      <div className="grid grid-cols-3 gap-3 mt-6">
+        <QuickAction icon="↔️" label="Swap" onClick={() => navigateToView('exchange')} />
+        <QuickAction icon="⬇️" label="Receive" onClick={() => navigateToView('addMoney')} />
+        <QuickAction icon="⬆️" label="Send" onClick={() => navigateToView('details')} />
       </div>
       
       {/* Recent Activity */}
@@ -87,8 +99,8 @@ const DashboardView = () => {
 };
 
 // Quick Action Button Component
-const QuickAction = ({ icon, label }: { icon: string; label: string }) => (
-  <div className="flex flex-col items-center">
+const QuickAction = ({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) => (
+  <div className="flex flex-col items-center cursor-pointer" onClick={onClick}>
     <div className="w-12 h-12 bg-[#9b87f5]/10 rounded-full flex items-center justify-center mb-2">
       <span className="text-xl">{icon}</span>
     </div>

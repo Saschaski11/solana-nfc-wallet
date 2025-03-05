@@ -45,6 +45,20 @@ const Index = () => {
     }
   };
 
+  const handleNavItemClick = (view: string) => {
+    if (view === 'dashboard') {
+      setActiveView('dashboard');
+    } else if (view === 'exchange') {
+      setActiveView('exchange');
+    } else if (view === 'details') {
+      setActiveView('details');
+    } else if (view === 'more') {
+      setActiveView('more');
+    } else if (view === 'addMoney') {
+      setActiveView('addMoney');
+    }
+  };
+
   return (
     <SolanaProvider>
       <NFCProvider>
@@ -76,7 +90,7 @@ const Index = () => {
                 
                 {/* Bottom navigation */}
                 <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
-                  <NavBar onNavItemClick={setActiveView} activeView={activeView} />
+                  <NavBar onNavItemClick={handleNavItemClick} activeView={activeView} />
                 </div>
               </div>
             )}
