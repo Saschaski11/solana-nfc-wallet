@@ -22,6 +22,9 @@ interface SolanaContextType {
   sendTransaction: (recipientAddress: string, amount: number) => Promise<string>;
   sendTokens: (recipientAddress: string, amount: number) => Promise<string>;
   connection: Connection;
+  solanaPrice: number;
+  solToUsd: (solAmount: number) => number;
+  usdToSol: (usdAmount: number) => number;
 }
 
 const SolanaContext = createContext<SolanaContextType | undefined>(undefined);
@@ -39,12 +42,55 @@ export const SolanaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [tokenBalance, setTokenBalance] = useState(0);
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
+  const [solanaPrice, setSolanaPrice] = useState<number>(0);
+  
   const connection = new Connection(
     config.network === 'mainnet-beta' 
       ? 'https://api.mainnet-beta.solana.com' 
       : 'https://api.devnet.solana.com',
     'confirmed'
   );
+
+  // Function to convert SOL to USD
+  const solToUsd = (solAmount: number): number => {
+    return solAmount * solanaPrice;
+  };
+
+  // Function to convert USD to SOL
+  const usdToSol = (usdAmount: number): number => {
+    return solanaPrice > 0 ? usdAmount / solanaPrice : 0;
+  };
+
+  // Fetch Solana price from CoinGecko API
+  useEffect(() => {
+    const fetchSolanaPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+        const data = await response.json();
+        if (data.solana && data.solana.usd) {
+          setSolanaPrice(data.solana.usd);
+        }
+      } catch (error) {
+        console.error('Error fetching Solana price:', error);
+        // Fallback price if API fails
+        setSolanaPrice(150);
+      }
+    };
+
+    fetchSolanaPrice();
+    // Refresh price every 5 minutes
+    const interval = setInterval(fetchSolanaPrice, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Check for saved private key in localStorage
+    const savedPrivateKey = localStorage.getItem('privateKey');
+    if (savedPrivateKey) {
+      importWallet(savedPrivateKey).catch(console.error);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -210,6 +256,9 @@ export const SolanaProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         sendTransaction,
         sendTokens,
         connection,
+        solanaPrice,
+        solToUsd,
+        usdToSol
       }}
     >
       {children}

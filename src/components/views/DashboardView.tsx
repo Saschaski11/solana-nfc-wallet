@@ -5,7 +5,7 @@ import { Copy } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 const DashboardView = () => {
-  const { balance, tokenBalance, publicKey } = useSolana();
+  const { balance, tokenBalance, publicKey, solanaPrice, solToUsd } = useSolana();
 
   const copyAddress = () => {
     if (publicKey) {
@@ -66,7 +66,10 @@ const DashboardView = () => {
           <h1 className="text-4xl font-bold">${tokenBalance.toFixed(2)}</h1>
           <span className="ml-2 text-xs text-green-400">+ 0.00%</span>
         </div>
-        <div className="mt-1 text-gray-400 text-sm">{balance.toFixed(5)} SOL</div>
+        <div className="mt-1 text-gray-400 text-sm">
+          {balance.toFixed(5)} SOL (${solToUsd(balance).toFixed(2)})
+          {solanaPrice > 0 && <span className="ml-2 text-xs">1 SOL = ${solanaPrice.toFixed(2)}</span>}
+        </div>
       </div>
       
       {/* Quick Actions */}
