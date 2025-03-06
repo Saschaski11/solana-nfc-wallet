@@ -4,7 +4,7 @@ import { useSolana } from '@/lib/SolanaContext';
 import { ArrowDown } from 'lucide-react';
 import config from '@/config/config';
 import { toast } from '@/components/ui/use-toast';
-import { PublicKey, Transaction, Keypair } from '@solana/web3.js';
+import { PublicKey, Transaction, Keypair, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token';
 
